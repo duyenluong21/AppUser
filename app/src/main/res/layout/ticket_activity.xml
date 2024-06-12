@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity.profile_activity">
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="58dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#4296D8"
+        android:padding="12dp"
+        android:src="@drawable/ic_back"/>
+    <TextView
+        android:id="@+id/cardTicket"
+        android:layout_width="match_parent"
+        android:layout_height="58dp"
+        android:text="Danh sách vé"
+        android:layout_marginStart="50dp"
+        android:background="#4296D8"
+        android:padding="10dp"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="20sp"/>
+    <!--  RecyclerView để hiển thị kết quả  -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewBookedTickets"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        android:padding="8dp"/>
+</RelativeLayout>
