@@ -14,17 +14,53 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.app_user.R;
 import com.example.app_user.activity.chatActivity;
 import com.example.app_user.model.Chat;
-import com.example.app_user.model.Mess;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder> {
     private List<Chat> mListChat;
     private Context mContext;
 
-    public ChatAdapter(Context context, List<Chat> listChat) {
+    public ChatAdapter(Context context) {
         mContext = context;
-        mListChat = listChat;
+        mListChat = new ArrayList<>();
+        loadChats(); // Gọi phương thức để tải dữ liệu chat từ Firebase
+    }
+
+    private void loadChats() {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("Chats");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mListChat.clear();
+                Set<String> addedCustomers = new HashSet<>(); // Tập hợp để lưu các mã KH đã xử lý
+
+                for (DataSnapshot chatSnapshot : dataSnapshot.getChildren()) {
+                    for (DataSnapshot messageSnapshot : chatSnapshot.getChildren()) {
+                        Chat chat = messageSnapshot.getValue(Chat.class);
+                        if (chat != null && !addedCustomers.contains(chat.getMaKH())) {
+                            // Chỉ thêm vào danh sách nếu maKH chưa tồn tại trong addedCustomers
+                            mListChat.add(chat);
+                            addedCustomers.add(chat.getMaKH()); // Đánh dấu maKH đã thêm vào danh sách
+                        }
+                    }
+                }
+                notifyDataSetChanged(); // Cập nhật adapter sau khi tải dữ liệu
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseError", databaseError.getMessage());
+            }
+        });
     }
 
     @NonNull
@@ -38,7 +74,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         Chat chat = mListChat.get(position);
         if (chat != null) {
-            holder.txtNamePassenger.setText(chat.getFullname());
+            holder.txtNamePassenger.setText(chat.getFullname() != null ? chat.getFullname() : "Người dùng không xác định");
 
             // Lấy mã KH từ mục tương ứng
             final String maKH = chat.getMaKH();
@@ -60,10 +96,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     public int getItemCount() {
         return mListChat != null ? mListChat.size() : 0;
     }
-    public void setData(List<Chat> listChat) {
-        mListChat = listChat;
-        notifyDataSetChanged();
-    }
+
     public class ChatViewHolder extends RecyclerView.ViewHolder {
         private TextView txtNamePassenger;
 

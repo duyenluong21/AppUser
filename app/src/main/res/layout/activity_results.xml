@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.FlightActivity">
+    tools:context=".activity.FlightActivity"
+    android:background="#EDEDED">
     <ImageView
         android:id="@+id/backButton"
         android:layout_width="wrap_content"
@@ -24,8 +25,10 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"/>
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabLayout"
+        android:background="#EDEDED"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/ttcanhan"

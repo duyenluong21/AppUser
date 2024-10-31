@@ -42,7 +42,14 @@ public class home_activity extends AppCompatActivity {
         if (receivedIntent != null) {
             user = receivedIntent.getParcelableExtra("object_user");
         }
-
+        Intent intentMaNV = getIntent();
+        if (intentMaNV != null && intentMaNV.hasExtra("object_user")) {
+            User user = (User) intentMaNV.getSerializableExtra("object_user");
+            if (user != null) {
+                String maNV = user.getMaNV();
+                // Sử dụng maNV theo yêu cầu
+            }
+        }
         // Kiểm tra đăng nhập
         if (!sessionManager.isLoggedIn()) {
             // Chuyển đến trang đăng nhập nếu chưa đăng nhập
@@ -67,7 +74,9 @@ public class home_activity extends AppCompatActivity {
         });
 
         messCard.setOnClickListener(v -> {
+            String maNV = user.getMaNV();
             Intent intent = new Intent(home_activity.this, chatUserActivity.class);
+            intent.putExtra("maNV", maNV); // Truyền maNV qua Intent
             startActivity(intent);
         });
     }

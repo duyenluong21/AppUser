@@ -4,46 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login"
     tools:context=".activity.MainActivity">
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:adjustViewBounds="false"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="match_parent"
+            android:layout_height="340dp"
+            android:layout_marginTop="0dp"
+            android:scaleType="centerCrop"
+            android:background="@drawable/maybay"
+            android:adjustViewBounds="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="0dp"
         android:layout_height="450dp"
-        android:layout_marginStart="7dp"
-        android:layout_marginEnd="7dp"
-        android:layout_marginBottom="100dp"
         android:orientation="vertical"
         android:paddingTop="80dp"
-        app:cardCornerRadius="30dp"
+        android:background="@drawable/custom_rounded_left"
         app:cardElevation="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/textView"
-            android:layout_width="388dp"
-            android:layout_height="94dp"
-            android:text="Đăng nhập"
-            android:textAlignment="center"
-            android:textSize="32sp"
-            android:textStyle="bold" />
+            android:id="@+id/loginTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đăng nhập"
+            android:textSize="36sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="2dp" />
+        <TextView
+            android:id="@+id/loginSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text= " Đăng nhập để tiếp tục"
+            android:textSize="16sp"
+            android:textColor="@color/gray"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/loginTitle"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="8dp" />
 
         <EditText
             android:id="@+id/username"
-            android:layout_width="360dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="40dp"
+            android:layout_width="390dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginRight="5dp"
             android:background="@drawable/custom_edittext"
             android:drawableLeft="@drawable/ic_name"
             android:drawablePadding="8dp"
@@ -55,9 +70,9 @@
 
         <EditText
             android:id="@+id/password"
-            android:layout_width="360dp"
-            android:layout_height="45dp"
-            android:layout_marginTop="40dp"
+            android:layout_width="390dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="30dp"
             android:background="@drawable/custom_edittext"
             android:drawableLeft="@drawable/ic_password"
             android:inputType="textPassword"
@@ -65,17 +80,18 @@
             android:ems="10"
             android:padding="8dp"
             android:hint="Mật khẩu: "
-            android:textColorHint="@color/cardview_dark_background" />
+            android:textColorHint="@color/cardview_dark_background"/>
 
         <Button
             android:id="@+id/buttonLogin"
-            android:layout_width="360dp"
-            android:layout_height="50dp"
+            android:layout_width="160dp"
+            android:layout_height="55dp"
+            android:layout_marginLeft="220dp"
             android:layout_marginTop="40dp"
-            android:background="@drawable/custom_button"
-            android:paddingTop="20px"
             android:text="Đăng nhập"
+            android:backgroundTint="#4CAF50"
             android:textSize="18sp"
+            android:textColor="@color/black"
             app:backgroundTint="@null" />
 
     </LinearLayout>

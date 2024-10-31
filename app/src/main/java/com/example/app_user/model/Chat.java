@@ -15,6 +15,9 @@ public class Chat implements Parcelable {
     String noiDung2;
     String thoiGianGui;
 
+    public Chat() {
+    }
+
     public String getMaKH() {
         return maKH;
     }

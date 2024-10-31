@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.passenger_activity">
+    tools:context=".activity.passenger_activity"
+    android:background="#EDEDED">
     <ImageView
         android:id="@+id/backButtonChat"
         android:layout_width="wrap_content"

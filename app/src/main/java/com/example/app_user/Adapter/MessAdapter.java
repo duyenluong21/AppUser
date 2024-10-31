@@ -33,7 +33,7 @@ public class MessAdapter extends RecyclerView.Adapter<MessAdapter.MessViewHolder
             return;
         }
 
-        if (!mess.getNoiDung1().isEmpty()) {
+        if (mess != null && mess.getNoiDung1() != null && !mess.getNoiDung1().isEmpty()) {
             holder.tvMess.setText(mess.getNoiDung1());
             holder.tvMess.setVisibility(View.VISIBLE);
         } else {

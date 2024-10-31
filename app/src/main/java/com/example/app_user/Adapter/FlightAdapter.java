@@ -36,6 +36,11 @@ public class FlightAdapter extends RecyclerView.Adapter<FlightAdapter.FlightView
         flights = in.createTypedArrayList(Flight.CREATOR);
     }
 
+    public void updateData(List<Flight> newFlightList) {
+        this.flights = newFlightList;
+        notifyDataSetChanged();
+    }
+
     public static final Creator<FlightAdapter> CREATOR = new Creator<FlightAdapter>() {
         @Override
         public FlightAdapter createFromParcel(Parcel in) {

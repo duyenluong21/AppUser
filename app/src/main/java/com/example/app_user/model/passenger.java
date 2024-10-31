@@ -3,16 +3,33 @@ package com.example.app_user.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class passenger implements Parcelable {
+public class Passenger implements Parcelable {
     private String fullname;
+    private String email;
     private String gioiTinh;
-
+    private String maKH ;
     private String ngaySinh;
     private String soCCCD;
     private String diaChi;
     private String soDT;
     private String loaiHanhKhach;
     private String tong;
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getMaKH() {
+        return maKH;
+    }
+
+    public void setMaKH(String maKH) {
+        this.maKH = maKH;
+    }
 
     public String getFullname() {
         return fullname;
@@ -91,7 +108,7 @@ public class passenger implements Parcelable {
                 ", tong='" + tong + '\'' +
                 '}';
     }
-    protected passenger(Parcel in) {
+    protected Passenger(Parcel in) {
         fullname = in.readString();
         gioiTinh = in.readString();
         ngaySinh = in.readString();
@@ -102,15 +119,15 @@ public class passenger implements Parcelable {
         tong = in.readString();
     }
 
-    public static final Creator<passenger> CREATOR = new Creator<passenger>() {
+    public static final Creator<Passenger> CREATOR = new Creator<Passenger>() {
         @Override
-        public passenger createFromParcel(Parcel in) {
-            return new passenger(in);
+        public Passenger createFromParcel(Parcel in) {
+            return new Passenger(in);
         }
 
         @Override
-        public passenger[] newArray(int size) {
-            return new passenger[size];
+        public Passenger[] newArray(int size) {
+            return new Passenger[size];
         }
     };
 

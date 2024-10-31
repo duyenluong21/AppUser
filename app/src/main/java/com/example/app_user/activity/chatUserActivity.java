@@ -1,6 +1,5 @@
 package com.example.app_user.activity;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,41 +8,39 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.app_user.Adapter.ChatAdapter;
-import com.example.app_user.Adapter.FlightAdapter;
 import com.example.app_user.R;
-import com.example.app_user.inteface.ApiService;
 import com.example.app_user.model.Chat;
-import com.example.app_user.model.Flight;
-import com.example.app_user.model.Mess;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class chatUserActivity extends AppCompatActivity {
-    private SessionManager sessionManager;
-    private CardView cardViewChatUser;
     private List<Chat> mListChat;
     private ChatAdapter chatAdapter;
-    ImageView backButtonChat;
+    private ImageView backButtonChat;
+    private DatabaseReference chatReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_chat);
-        sessionManager = new SessionManager(getApplicationContext());
+
         backButtonChat = findViewById(R.id.backButtonChat);
         mListChat = new ArrayList<>();
-//        cardViewChatUser = findViewById(R.id.cardUserChat);
+
+        // Firebase reference to "Chats" node
+        chatReference = FirebaseDatabase.getInstance().getReference("Chats");
+
+        // Set up back button to navigate to home activity
         backButtonChat.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -52,57 +49,38 @@ public class chatUserActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        // Set up RecyclerView
         RecyclerView recyclerView = findViewById(R.id.recyclerViewChat);
-        chatAdapter = new ChatAdapter(this, mListChat);
-
-        // Thiết lập LayoutManager cho RecyclerView
+        chatAdapter = new ChatAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        // Gắn Adapter vào RecyclerView
         recyclerView.setAdapter(chatAdapter);
+
+        // Load chat data from Firebase
         getChatUser();
-
-//
-//        cardViewChatUser.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(chatUserActivity.this, chatActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//
-//        });
-
     }
 
     private void getChatUser() {
-        ApiService.searchFlight.getListChat(new HashMap<>()).enqueue(new Callback<ApiResponse<List<Chat>>>() {
+        // Listening for changes in "Chats" node in Firebase
+        chatReference.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Chat>>> call, Response<ApiResponse<List<Chat>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<List<Chat>> apiResponse = response.body();
-                    if (apiResponse.getData() != null) {
-                        mListChat = apiResponse.getData();
-                        // Cập nhật dữ liệu mới cho Adapter
-                        chatAdapter.setData(mListChat);
-                        // Thông báo rằng dữ liệu đã thay đổi
-                        chatAdapter.notifyDataSetChanged();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mListChat.clear(); // Clear the list to avoid duplication
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Chat chat = snapshot.getValue(Chat.class); // Parse each chat object
+                    if (chat != null) {
+                        mListChat.add(chat); // Add chat to the list
                     }
-                } else {
-                    Log.e("API Error", "Error: " + response.code() + " " + response.message());
-                    Toast.makeText(chatUserActivity.this, "Call Api error", Toast.LENGTH_SHORT).show();
                 }
+//                chatAdapter.setData(mListChat); // Update adapter with new data
+                chatAdapter.notifyDataSetChanged(); // Notify adapter about data changes
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Chat>>> call, Throwable t) {
-                Log.e("API Error", "Error: " + t.getMessage());
-                Toast.makeText(chatUserActivity.this, "Call Api error", Toast.LENGTH_SHORT).show();
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseError", "Error: " + databaseError.getMessage());
+                Toast.makeText(chatUserActivity.this, "Error loading chat data", Toast.LENGTH_SHORT).show();
             }
         });
     }
 }
-
-
-

@@ -29,6 +29,9 @@
             android:name=".activity.FlightActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.PassengerDetail"
+            android:exported="false" />
+        <activity
             android:name=".activity.passenger_activity"
             android:exported="false" />
         <activity

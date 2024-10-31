@@ -19,21 +19,18 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.app_user.Adapter.MessAdapter;
 import com.example.app_user.R;
-import com.example.app_user.inteface.ApiService;
 import com.example.app_user.model.Mess;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class chatActivity extends AppCompatActivity {
 
@@ -42,28 +39,44 @@ public class chatActivity extends AppCompatActivity {
     private RecyclerView rcvMess;
     private MessAdapter messAdapter;
     private List<Mess> mListMess;
-    private SessionManager sessionManager;
+    private DatabaseReference chatReference;
+    private String maKH;
+    private String maNV;
     ImageView backButton;
     TextView txtNamePassenger;
-    Mess messData ;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
         backButton = findViewById(R.id.backButtonMess);
         editMess = findViewById(R.id.edit_mess);
         btnSend = findViewById(R.id.btn_send);
         rcvMess = findViewById(R.id.rcv_mess);
-        sessionManager = new SessionManager(getApplicationContext());
+
+        chatReference = FirebaseDatabase.getInstance().getReference("Chats");
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        rcvMess.setLayoutManager(linearLayoutManager);;
+        rcvMess.setLayoutManager(linearLayoutManager);
         mListMess = new ArrayList<>();
         messAdapter = new MessAdapter();
         messAdapter.setData(mListMess);
         rcvMess.setAdapter(messAdapter);
+
         Intent intent = getIntent();
-        String maKH = intent.getStringExtra("maKH");
-        getListMess(maKH);
+        if (intent != null) {
+            maKH = intent.getStringExtra("maKH");
+            maNV = intent.getStringExtra("maNV");
+
+            // Kiểm tra xem maKH và maNV có null không trước khi gọi getListMess
+            if (!TextUtils.isEmpty(maKH)) {
+                getListMess();
+            } else {
+                Log.e("YourTag", "maKH is null");
+            }
+        }
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +86,7 @@ public class chatActivity extends AppCompatActivity {
                 finish();
             }
         });
+
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,15 +102,12 @@ public class chatActivity extends AppCompatActivity {
         });
     }
 
-
-
     private void checkKeyboard() {
         final View activityRootView = findViewById(R.id.activityRoot);
         activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 Rect r = new Rect();
-
                 activityRootView.getWindowVisibleDisplayFrame(r);
 
                 int heightDiff = activityRootView.getRootView().getHeight();
@@ -110,36 +121,30 @@ public class chatActivity extends AppCompatActivity {
         });
     }
 
-    private void getListMess(String maKH) {
-        ApiService.searchFlight.getListMess(maKH).enqueue(new Callback<ApiResponse<List<Mess>>>() {
+    private void getListMess() {
+        chatReference.child(maKH).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onResponse(Call<ApiResponse<List<Mess>>> call, Response<ApiResponse<List<Mess>>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse<List<Mess>> apiResponse = response.body();
-                    if (apiResponse.getData() != null) {
-                        messAdapter = new MessAdapter();
-                        rcvMess.setAdapter(messAdapter);
-                        mListMess = apiResponse.getData();
-                        for (Mess mess : mListMess) {
-                            Log.d("MessContent", "maTN: " + mess.getMaTN() + ", noiDung1: " + mess.getNoiDung1());
-                            // Thêm các trường khác nếu cần thiết
-                        }
-                        messAdapter.setData(mListMess);
-                        messAdapter.notifyDataSetChanged();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                mListMess.clear();
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Mess message = snapshot.getValue(Mess.class);
+                    if (message != null) {
+                        mListMess.add(message);
                     }
-                } else {
-                    Log.e("API Error", "Error: " + response.code() + " " + response.message());
-                    Toast.makeText(chatActivity.this, "Call Api error", Toast.LENGTH_SHORT).show();
                 }
+                messAdapter.setData(mListMess);
+                messAdapter.notifyDataSetChanged();
+                rcvMess.smoothScrollToPosition(mListMess.size() - 1);
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<List<Mess>>> call, Throwable t) {
-                Log.e("API Error", "Error: " + t.getMessage());
-                Toast.makeText(chatActivity.this, "Call Api error", Toast.LENGTH_SHORT).show();
+            public void onCancelled(DatabaseError databaseError) {
+                Log.e("FirebaseError", "Error: " + databaseError.getMessage());
+                Toast.makeText(chatActivity.this, "Error loading messages", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
     private void sendMess() {
         if (editMess != null && editMess.getText() != null) {
             String strMess = editMess.getText().toString();
@@ -147,60 +152,35 @@ public class chatActivity extends AppCompatActivity {
                 Log.d("YourTag", "EditText content is empty");
                 return;
             }
-            Intent intent = getIntent();
-            if (intent != null && intent.hasExtra("maKH")) {
-                String maKH = intent.getStringExtra("maKH");
+            if (maKH != null) {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
                 String thoiGianGui = sdf.format(new Date());
-                Log.d("YourTag", "maKH in sendMess: " + maKH);
-
-                // Gọi addMess để thêm tin nhắn và gửi lên API
                 addMess(maKH, strMess, thoiGianGui);
-                mListMess.add(new Mess(maKH,strMess, thoiGianGui));
+                mListMess.add(new Mess(maKH, strMess, thoiGianGui));
                 messAdapter.notifyDataSetChanged();
                 rcvMess.scrollToPosition(mListMess.size() - 1);
             } else {
-                Log.e("YourTag", "Intent or maKH is null");
+                Log.e("YourTag", "maKH is null");
                 Toast.makeText(getApplicationContext(), "Có lỗi xảy ra", Toast.LENGTH_SHORT).show();
             }
-
         } else {
             Log.e("YourTag", "EditText or its text is null");
         }
     }
 
     private void addMess(String maKH, String strMess, String thoiGianGui) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        HashMap<String, String> requestData = new HashMap<>();
-        String currentTime = sdf.format(new Date());
-        requestData.put("maKH", maKH);
-        requestData.put("noiDung1", strMess);
-        requestData.put("thoiGianGui", currentTime);
-//        requestData.put("noiDung2", "");
-
-
-        Log.d("YourTag", "maKH in addMess: " + maKH);
-        Log.d("YourTag", "requestData in addMess: " + requestData.toString());
-
-        ApiService.searchFlight.storeMess(requestData).enqueue(new Callback<ApiResponse<List<Mess>>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<List<Mess>>> call, Response<ApiResponse<List<Mess>>> response) {
-                if (response.isSuccessful()) {
-                    // Xử lý thành công
-                    editMess.setText("");
-                    Toast.makeText(getApplicationContext(), "Tin nhắn đã được gửi", Toast.LENGTH_LONG).show();
-                } else {
-                    // Xử lý lỗi
-                    editMess.setText("");
-                    Toast.makeText(getApplicationContext(), "Không gửi được tin nhắn", Toast.LENGTH_LONG).show();
-                }
-            }
-
-            public void onFailure(Call<ApiResponse<List<Mess>>> call, Throwable t) {
-                Log.e("YourTag", "Error: " + t.getMessage());
-
-            }
-        });
+        String messageId = chatReference.child(maKH).push().getKey();
+        if (messageId != null) {
+            Mess message = new Mess(maKH, strMess, thoiGianGui);
+            chatReference.child(maKH).child(messageId).setValue(message)
+                    .addOnSuccessListener(aVoid -> {
+                        editMess.setText("");
+                        Toast.makeText(getApplicationContext(), "Tin nhắn đã được gửi", Toast.LENGTH_LONG).show();
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("FirebaseError", "Error: " + e.getMessage());
+                        Toast.makeText(getApplicationContext(), "Không gửi được tin nhắn", Toast.LENGTH_LONG).show();
+                    });
+        }
     }
-
 }

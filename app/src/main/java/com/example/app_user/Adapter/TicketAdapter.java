@@ -15,7 +15,6 @@ import com.example.app_user.model.Ticket;
 import java.util.ArrayList;
 import java.util.List;
 import com.example.app_user.R;
-import com.example.app_user.model.passenger;
 
 public class TicketAdapter extends RecyclerView.Adapter<TicketAdapter.TicketViewHolder> {
     private List<Ticket> tickets;

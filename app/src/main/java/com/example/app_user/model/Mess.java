@@ -8,11 +8,20 @@ public class Mess implements Parcelable{
     private String noiDung1;
     private String thoiGianGui;
     private String maKH;
+    private String maNV;
     private String noiDung2;
+    public Mess() {
 
+    }
     public Mess(String maKH, String noiDung1, String thoiGianGui) {
         this.noiDung1 = noiDung1;
         this.maKH = maKH;
+        this.thoiGianGui = thoiGianGui;
+    }
+    public Mess(String maNV, String maKH, String noiDung1, String thoiGianGui) {
+        this.noiDung1 = noiDung1;
+        this.maKH = maKH;
+        this.maNV = maNV;
         this.thoiGianGui = thoiGianGui;
     }
 
