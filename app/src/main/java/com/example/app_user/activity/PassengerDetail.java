@@ -1,19 +1,30 @@
 package com.example.app_user.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Debug;
+import android.os.Environment;
+import android.os.SystemClock;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+//import com.example.app_user.Manifest;
 import com.example.app_user.inteface.ApiService;
 import com.example.app_user.R;
 import com.example.app_user.model.Passenger;
 import com.example.app_user.model.SumTicket;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -24,6 +35,9 @@ import retrofit2.Response;
 public class PassengerDetail extends AppCompatActivity {
     private EditText txtHoVaTen, txtEmail, txtDiaChi, txtSoDienThoai, txtChuyenBay, txtSoLuong;
     ImageView backButton;
+    private static final int REQUEST_PERMISSION = 1;
+    private static final int REQUEST_CODE_WRITE_EXTERNAL = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +51,7 @@ public class PassengerDetail extends AppCompatActivity {
         txtSoLuong = findViewById(R.id.txtSoLuong);
         // Get the maKH from intent
         String maKH = getIntent().getStringExtra("maKH");
+
 
         // Fetch passenger details based on maKH
         if (maKH != null) {
@@ -55,15 +70,28 @@ public class PassengerDetail extends AppCompatActivity {
         });
     }
 
+
+
     private void fetchPassengerDetails(String maKH) {
+        long startCpuTime = Debug.threadCpuTimeNanos();
+        long startThreadTime = SystemClock.currentThreadTimeMillis();
+
         ApiService.searchFlight.getPassenger().enqueue(new Callback<ApiResponse<List<Passenger>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Passenger>>> call, Response<ApiResponse<List<Passenger>>> response) {
+                long endCpuTime = Debug.threadCpuTimeNanos();
+                long endThreadTime = SystemClock.currentThreadTimeMillis();
+
+                long elapsedCpuTime = endCpuTime - startCpuTime;
+                long elapsedThreadTime = endThreadTime - startThreadTime;
+
+                Log.d("API Timing", "CPU time for API: " + elapsedCpuTime + " ns");
+                Log.d("API Timing", "Thread time for API: " + elapsedThreadTime + " ms");
+
                 if (response.isSuccessful() && response.body() != null) {
-                    List<Passenger> passengers = response.body().getData(); // Lấy danh sách hành khách
+                    List<Passenger> passengers = response.body().getData();
                     Passenger selectedPassenger = null;
 
-                    // Tìm hành khách có maKH tương ứng
                     for (Passenger passenger : passengers) {
                         if (passenger.getMaKH().equals(maKH)) {
                             selectedPassenger = passenger;
@@ -72,7 +100,7 @@ public class PassengerDetail extends AppCompatActivity {
                     }
 
                     if (selectedPassenger != null) {
-                        populateUI(selectedPassenger, null); // Hiển thị thông tin hành khách
+                        populateUI(selectedPassenger, null);
                     } else {
                         Toast.makeText(PassengerDetail.this, "Hành khách không tìm thấy", Toast.LENGTH_SHORT).show();
                     }
@@ -87,6 +115,40 @@ public class PassengerDetail extends AppCompatActivity {
             }
         });
     }
+
+
+    //    private void fetchPassengerDetails(String maKH) {
+//        ApiService.searchFlight.getPassenger().enqueue(new Callback<ApiResponse<List<Passenger>>>() {
+//            @Override
+//            public void onResponse(Call<ApiResponse<List<Passenger>>> call, Response<ApiResponse<List<Passenger>>> response) {
+//                if (response.isSuccessful() && response.body() != null) {
+//                    List<Passenger> passengers = response.body().getData(); // Lấy danh sách hành khách
+//                    Passenger selectedPassenger = null;
+//
+//                    // Tìm hành khách có maKH tương ứng
+//                    for (Passenger passenger : passengers) {
+//                        if (passenger.getMaKH().equals(maKH)) {
+//                            selectedPassenger = passenger;
+//                            break;
+//                        }
+//                    }
+//
+//                    if (selectedPassenger != null) {
+//                        populateUI(selectedPassenger, null); // Hiển thị thông tin hành khách
+//                    } else {
+//                        Toast.makeText(PassengerDetail.this, "Hành khách không tìm thấy", Toast.LENGTH_SHORT).show();
+//                    }
+//                } else {
+//                    Toast.makeText(PassengerDetail.this, "Lỗi khi lấy dữ liệu", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ApiResponse<List<Passenger>>> call, Throwable t) {
+//                Toast.makeText(PassengerDetail.this, "Lỗi API: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
     // Fetch flight and ticket details by maKH
     private void fetchSumTickets(String maKH) {
         ApiService.searchFlight.getSum(Integer.parseInt(maKH)).enqueue(new Callback<ApiResponse<SumTicket>>() {
