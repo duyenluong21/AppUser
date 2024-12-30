@@ -61,19 +61,18 @@ public class chatUserActivity extends AppCompatActivity {
     }
 
     private void getChatUser() {
-        // Listening for changes in "Chats" node in Firebase
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                mListChat.clear(); // Clear the list to avoid duplication
+                mListChat.clear();
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Chat chat = snapshot.getValue(Chat.class); // Parse each chat object
+                    Chat chat = snapshot.getValue(Chat.class);
                     if (chat != null) {
-                        mListChat.add(chat); // Add chat to the list
+                        mListChat.add(chat);
                     }
                 }
-//                chatAdapter.setData(mListChat); // Update adapter with new data
-                chatAdapter.notifyDataSetChanged(); // Notify adapter about data changes
+//                chatAdapter.setData(mListChat);
+                chatAdapter.notifyDataSetChanged();
             }
 
             @Override

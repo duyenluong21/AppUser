@@ -73,21 +73,10 @@ public class PassengerDetail extends AppCompatActivity {
 
 
     private void fetchPassengerDetails(String maKH) {
-        long startCpuTime = Debug.threadCpuTimeNanos();
-        long startThreadTime = SystemClock.currentThreadTimeMillis();
-
         ApiService.searchFlight.getPassenger().enqueue(new Callback<ApiResponse<List<Passenger>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Passenger>>> call, Response<ApiResponse<List<Passenger>>> response) {
-                long endCpuTime = Debug.threadCpuTimeNanos();
-                long endThreadTime = SystemClock.currentThreadTimeMillis();
-
-                long elapsedCpuTime = endCpuTime - startCpuTime;
-                long elapsedThreadTime = endThreadTime - startThreadTime;
-
-                Log.d("API Timing", "CPU time for API: " + elapsedCpuTime + " ns");
-                Log.d("API Timing", "Thread time for API: " + elapsedThreadTime + " ms");
-
+                // Xử lý dữ liệu trả về
                 if (response.isSuccessful() && response.body() != null) {
                     List<Passenger> passengers = response.body().getData();
                     Passenger selectedPassenger = null;
@@ -115,6 +104,9 @@ public class PassengerDetail extends AppCompatActivity {
             }
         });
     }
+
+
+
 
 
     //    private void fetchPassengerDetails(String maKH) {

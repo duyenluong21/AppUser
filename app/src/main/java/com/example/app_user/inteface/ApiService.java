@@ -4,6 +4,8 @@ package com.example.app_user.inteface;
 import com.example.app_user.model.Chat;
 import com.example.app_user.model.Flight;
 import com.example.app_user.model.Mess;
+import com.example.app_user.model.PublicKeyPassenger;
+import com.example.app_user.model.PublicKeyRequest;
 import com.example.app_user.model.SumTicket;
 import com.example.app_user.model.Ticket;
 import com.example.app_user.model.User;
@@ -16,12 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
@@ -32,7 +36,7 @@ public interface ApiService {
             .create();
 
     ApiService searchFlight = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.9/TTCS/app/")
+            .baseUrl("http://192.168.1.5/TTCS/app/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ApiService.class);
@@ -70,5 +74,17 @@ public interface ApiService {
 
         return userBookedTickets;
     }
+
+    @PUT("api/updatePublicKeyStaff.php")
+    Call<Void> updatePublicKey(@Query("maNV") String maNV, @Body PublicKeyRequest updateParams);
+
+    @GET("api/readPublicKey.php")
+    Call<ApiResponse<PublicKeyPassenger>> getPublicKey(@Query("maKH") String maKH);
+
+    @GET("api/checkPublicKey.php")
+    Call<ResponseBody> checkIfUserHasPublicKey(@Query("maKH") String maKH);
+
+    @GET("api/readPassenger.php")
+    Call<ApiResponse<Passenger>> getPassengerById(@Query("maKH") String maKH);
 }
 

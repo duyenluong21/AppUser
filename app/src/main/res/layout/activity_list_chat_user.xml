@@ -1,69 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/list_item"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp"
+    android:background="@drawable/border_radius"
+    android:layout_margin="2dp">
 
-    >
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardUserChat"
-        android:layout_height="100dp"
+    <ImageView
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="8dp"
+        android:src="@drawable/avt2"
+        android:scaleType="centerCrop"/>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_marginBottom="10dp"
-        android:layout_margin="20dp"
-        >
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="100dp"
-            >
-            <ImageView
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/avatar"
-                android:layout_marginTop="20dp"
-                android:layout_marginLeft="10dp"
-                />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-                >
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp">
-                    <TextView
-                        android:id="@+id/txtNamePassenger"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="10dp"
-                        android:hint="Tên người dùng"
-                        android:layout_marginTop="10dp"
-                        android:textColorHint="@color/black"
-                        android:textColor="@color/black"
-                        android:textSize="15dp"/>
-                </LinearLayout>
+        <TextView
+            android:id="@+id/txtNamePassenger"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên người dùng"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:textSize="16sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    >
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:padding="10dp"
-                        android:layout_marginBottom="10dp"
-                        android:textColor="@color/black"
-                        android:text="Xem tin nhắn"
-                        android:textSize="15dp"/>
-                </LinearLayout>
-
-
-
-            </LinearLayout>
-
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</RelativeLayout>
+        <TextView
+            android:id="@+id/textViewLastMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#666"
+            android:text="Xem tin nhắn"
+            android:textSize="14sp" />
+    </LinearLayout>
+</LinearLayout>

@@ -37,12 +37,16 @@ public class passenger_activity extends AppCompatActivity {
     private PassengerAdapter passengerAdapter; // Đảm bảo biến này được khai báo
     ImageView backButton;
     SearchView timKiemKH;
-    private static final String TRACE_FILE_NAME = "appUserTrace.trace";
     private static final int REQUEST_PERMISSION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        String traceFile = getExternalFilesDir(null) + "/passenger.trace";
+        Debug.startMethodTracing(traceFile, 16 * 1024, Debug.TRACE_COUNT_ALLOCS);
+
+        // Các công việc khởi tạo khác của ứng dụng
+        Log.d("Tracing", "Method tracing started: " + traceFile);
         setContentView(R.layout.activity_passenger);
         backButton = findViewById(R.id.backButton);
         timKiemKH = findViewById(R.id.timKiemKH);
@@ -70,15 +74,7 @@ public class passenger_activity extends AppCompatActivity {
 
         // Gắn Adapter vào RecyclerView
         recyclerView.setAdapter(passengerAdapter); // Đảm bảo rằng passengerAdapter đã được khởi tạo
-
-        // Gọi API để lấy danh sách chuyến bay
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            // Yêu cầu quyền truy cập
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_PERMISSION);
-        } else {
-            // Được phép, thực hiện tracing
-            startMethodTracing();
-        }
+        getListPassenger();
 
 
         // Thiết lập SearchView để tìm kiếm khách hàng
@@ -97,39 +93,12 @@ public class passenger_activity extends AppCompatActivity {
         });
     }
 
-    private void startMethodTracing() {
-        // Kiểm tra nếu quyền đã được cấp và bắt đầu tracing
-        String traceFile = getExternalFilesDir(null) + "/appUserTrace.trace"; // Tùy chỉnh đường dẫn file
-//        Debug.startMethodTracing(traceFile);
-//        Debug.startMethodTracing(traceFile, 8 * 1024);
-        Debug.startMethodTracing(traceFile, 16 * 1024, Debug.TRACE_COUNT_ALLOCS);
-        // Tiến hành công việc bạn muốn đo hiệu suất
-        getListPassenger();
-        Log.d("Path trace file: ", traceFile);
-        Debug.stopMethodTracing(); // Dừng tracing sau khi công việc hoàn thành
-    }
 
     private void getListPassenger() {
-        // Ghi lại thời gian bắt đầu
-        long startTimeMillis = System.currentTimeMillis();
-        long startTimeNano = System.nanoTime();
-        long startElapsedRealtime = SystemClock.elapsedRealtime();
-        long startUptimeMillis = SystemClock.uptimeMillis();
 
         ApiService.searchFlight.getListUser(new HashMap<>()).enqueue(new Callback<ApiResponse<List<Passenger>>>() {
             @Override
             public void onResponse(Call<ApiResponse<List<Passenger>>> call, Response<ApiResponse<List<Passenger>>> response) {
-                // Ghi lại thời gian kết thúc
-                long endTimeMillis = System.currentTimeMillis();
-                long endTimeNano = System.nanoTime();
-                long endElapsedRealtime = SystemClock.elapsedRealtime();
-                long endUptimeMillis = SystemClock.uptimeMillis();
-
-                // Tính toán thời gian thực hiện
-                Log.d("API Timing", "Time in millis: " + (endTimeMillis - startTimeMillis) + " ms");
-                Log.d("API Timing", "Time in nano: " + (endTimeNano - startTimeNano) + " ns");
-                Log.d("API Timing", "Elapsed realtime: " + (endElapsedRealtime - startElapsedRealtime) + " ms");
-                Log.d("API Timing", "Uptime millis: " + (endUptimeMillis - startUptimeMillis) + " ms");
 
                 if (response.isSuccessful() && response.body() != null) {
                     ApiResponse<List<Passenger>> apiResponse = response.body();
@@ -146,18 +115,6 @@ public class passenger_activity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ApiResponse<List<Passenger>>> call, Throwable t) {
-                // Ghi lại thời gian kết thúc trong trường hợp lỗi
-                long endTimeMillis = System.currentTimeMillis();
-                long endTimeNano = System.nanoTime();
-                long endElapsedRealtime = SystemClock.elapsedRealtime();
-                long endUptimeMillis = SystemClock.uptimeMillis();
-
-                // Tính toán thời gian thực hiện
-                Log.d("API Timing", "Time in millis: " + (endTimeMillis - startTimeMillis) + " ms");
-                Log.d("API Timing", "Time in nano: " + (endTimeNano - startTimeNano) + " ns");
-                Log.d("API Timing", "Elapsed realtime: " + (endElapsedRealtime - startElapsedRealtime) + " ms");
-                Log.d("API Timing", "Uptime millis: " + (endUptimeMillis - startUptimeMillis) + " ms");
-
                 Log.e("API Error", "Error: " + t.getMessage());
                 Toast.makeText(passenger_activity.this, "Call Api error", Toast.LENGTH_SHORT).show();
             }

@@ -33,17 +33,18 @@ public class MessAdapter extends RecyclerView.Adapter<MessAdapter.MessViewHolder
             return;
         }
 
-        if (mess != null && mess.getNoiDung1() != null && !mess.getNoiDung1().isEmpty()) {
-            holder.tvMess.setText(mess.getNoiDung1());
-            holder.tvMess.setVisibility(View.VISIBLE);
+        if (mess.getDecryptedMessage() != null && !mess.getDecryptedMessage().isEmpty()) {
+            if (!mess.isFromCustomer()) {
+                holder.tvMess.setText(mess.getDecryptedMessage());
+                holder.tvMess.setVisibility(View.VISIBLE);
+                holder.tvMess2.setVisibility(View.GONE); // Ẩn tvMess2
+            } else {
+                holder.tvMess2.setText(mess.getDecryptedMessage());
+                holder.tvMess2.setVisibility(View.VISIBLE);
+                holder.tvMess.setVisibility(View.GONE); // Ẩn tvMess
+            }
         } else {
             holder.tvMess.setVisibility(View.GONE);
-        }
-
-        if (mess != null && mess.getNoiDung2() != null && !mess.getNoiDung2().isEmpty()) {
-            holder.tvMess2.setText(mess.getNoiDung2());
-            holder.tvMess2.setVisibility(View.VISIBLE);
-        } else {
             holder.tvMess2.setVisibility(View.GONE);
         }
     }

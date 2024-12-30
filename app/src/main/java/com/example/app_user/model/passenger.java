@@ -3,6 +3,8 @@ package com.example.app_user.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 public class Passenger implements Parcelable {
     private String fullname;
     private String email;
@@ -98,6 +100,7 @@ public class Passenger implements Parcelable {
     @Override
     public String toString() {
         return "passenger{" +
+                ", maKH='" + maKH + '\'' +
                 ", fullname='" + fullname + '\'' +
                 ", gioiTinh='" + gioiTinh + '\'' +
                 ", ngaySinh='" + ngaySinh + '\'' +
@@ -109,6 +112,7 @@ public class Passenger implements Parcelable {
                 '}';
     }
     protected Passenger(Parcel in) {
+        maKH = in.readString();
         fullname = in.readString();
         gioiTinh = in.readString();
         ngaySinh = in.readString();
@@ -138,6 +142,7 @@ public class Passenger implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(maKH);
         dest.writeString(fullname);
         dest.writeString(gioiTinh);
         dest.writeString(ngaySinh);
